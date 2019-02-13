@@ -10,7 +10,8 @@ MongoClient.connect("mongodb://localhost:27017", {useNewUrlParser: true}, (error
 
 	// db.collection("todos").findOneAndUpdate(
 	// 	{_id: ObjectID("5c4da9dbde28d20868205c49")}, 
-	// 	{$set: {completed: true}}, {returnOriginal: false}
+	// 	{$set: {completed: true}}, 
+	//  {returnOriginal: false}
 	// )
 	// .then(result => {
 	// 	console.log(JSON.stringify(result));
@@ -21,7 +22,8 @@ MongoClient.connect("mongodb://localhost:27017", {useNewUrlParser: true}, (error
 
 	db.collection("users").findOneAndUpdate(
 		{_id: ObjectID("5c4da5884ee1ae6d8ba67d93")}, 
-		{$set: {name: "Nico"}, $inc: {age: -1}}, {returnOriginal: false}
+		{$set: {name: "Nico"}, $inc: {age: -1}}, 
+		{returnOriginal: false}
 	)
 	.then(result => {
 		console.log(JSON.stringify(result, undefined, 2));
