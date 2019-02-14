@@ -6,6 +6,8 @@ const {mongoose} = require("./db/mongoose");
 const {Todo, User} = require("./models");
 
 const app = express();
+//PORT set by heroku
+const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
@@ -37,8 +39,8 @@ app.get("/todos/:id", (request, response) => {
 });
 
 
-app.listen(3000, () => {
-	console.log("Started on port 3000");
+app.listen(port, () => {
+	console.log(`Started on port ${port}`);
 });
 
 module.exports = {app};
