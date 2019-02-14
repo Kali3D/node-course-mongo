@@ -4,9 +4,10 @@ const request = require("supertest");
 const {app} = require("../server.js");
 const {Todo, User} = require("../models");
 
+const dummies = [{text: "dummy 01"}, {text: "dummy 02"}, {text: "dummy 03"}];
+
 beforeEach(done => {
-	Todo.deleteMany({})
-	.then(() => done());
+	Todo.deleteMany({}).then(() => Todo.insertMany(dummies)).then(() => done());
 });
 
 describe("POST /todos", () => {
@@ -19,7 +20,7 @@ describe("POST /todos", () => {
 			})
 			.end((error, response) => {
 				if (error) return done(error);
-				Todo.find()
+				Todo.find({text})
 				.then((todos) => {
 					expect(todos.length).toBe(1);
 					expect(todos[0].text).toBe(text);
@@ -35,10 +36,21 @@ describe("POST /todos", () => {
 				if (error) return done(error);
 				Todo.find()
 				.then((todos) => {
-					expect(todos.length).toBe(0);
+					expect(todos.length).toBe(3);
 					done();
 				})
 				.catch(error => done(error));
-			})
+			});
 	});
 });
+
+describe("GET /todos", () => {
+	it("should get all todos", done => {
+		request(app).get("/todos")
+		.expect(200)
+		.expect(response => {
+			expect(response.body.todos.length).toBe(3);
+		})
+		.end(done);
+	});
+})
