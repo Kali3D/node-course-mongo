@@ -81,3 +81,24 @@ describe("GET /todos/:id", () => {
 		.end(done);
 	});
 });
+
+describe("DELETE /todos/:id", () => {
+	it("should return the deleted todo", done => {
+		request(app).findOneAndDelete("/todos/"+dummies[0]._id.toHexString())
+		.expect(200)
+		.expect(response => {
+			expect(response.body.todo.text).toBe(dummies[0].text)
+		})
+		.end(done);
+	});
+	it("should return a 404 if todo not found", done => {
+		request(app).findOneAndDelete("/todos/"+new ObjectID().toHexString())
+		.expect(404)
+		.end(done);
+	});
+	it("should return a 404 for bad ObjectID", done => {
+		request(app).findOneAndDelete("/todos/12345")
+		.expect(404)
+		.end(done);
+	});
+});
