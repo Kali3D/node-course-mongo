@@ -84,12 +84,22 @@ describe("GET /todos/:id", () => {
 
 describe("DELETE /todos/:id", () => {
 	it("should return the deleted todo", done => {
-		request(app).delete("/todos/"+dummies[0]._id.toHexString())
+		const hexId = dummies[0]._id.toHexString();
+		request(app).delete("/todos/"+hexId)
 		.expect(200)
 		.expect(response => {
 			expect(response.body.todo.text).toBe(dummies[0].text)
 		})
-		.end(done);
+		.end((error, response) => {
+			if (error)
+				return done(error);
+			Todo.findById(hexId).then(todo => {
+				expect(todo).toBeNull();
+				done();
+			})
+			.catch(error => done(error));
+
+		});
 	});
 	it("should return a 404 if todo not found", done => {
 		request(app).delete("/todos/"+new ObjectID().toHexString())
