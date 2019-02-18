@@ -2,19 +2,12 @@ const expect = require("expect");
 const request = require("supertest");
 const {ObjectID} = require("mongodb");
 
-const {app} = require("../server.js");
+const {app} = require("../server");
 const {Todo, User} = require("../models");
+const {dummies, populateTodos, populateUsers, users} = require("./seed");
 
-
-const dummies = [
-	{_id: new ObjectID(), text: "dummy 01"}, 
-	{_id: new ObjectID(), text: "dummy 02", completed: true, completedAt: 12345}, 
-	{_id: new ObjectID(), text: "dummy 03"}
-];
-
-beforeEach(done => {
-	Todo.deleteMany({}).then(() => Todo.insertMany(dummies)).then(() => done());
-});
+beforeEach(populateUsers);
+beforeEach(populateTodos);
 
 describe("POST /todos", () => {
 	it("should create a new todo", (done) => {
@@ -141,5 +134,65 @@ describe("PATCH /todos/:id", () => {
 		.end(done);
 	});
 
+});
 
+describe("Get /users/me", () => {
+	it("should return a user if autenticated", done => {
+		request(app).get("/users/me")
+		.set("x-auth", users[0].tokens[0].token)
+		.expect(200)
+		.expect(response => {
+			expect(response.body._id).toBe(users[0]._id.toHexString());
+			expect(response.body.email).toBe(users[0].email);
+		})
+		.end(done);
+	});
+
+	it("should return a 401 if not autenticated", done => {
+		request(app).get("/users/me")
+		.expect(401)
+		.expect(response => {
+			expect(response.body).toEqual({});
+		})
+		.end(done);
+	});
+});
+
+describe("POST /users", () => {
+	it("should create a user", done => {
+		const email = "q@s.fr";
+		const password = "123654789";
+		request(app).post("/users").send({email, password})
+		.expect(200)
+		.expect(response => {
+			expect(response.headers["x-auth"]).toBeTruthy();
+			expect(response.body._id).toBeTruthy();
+			expect(response.body.email).toBe(email);
+		})
+		.end(error => {
+			if (error)
+				return done(error);
+			User.findOne({email}).then(user => {
+				expect(user).toBeTruthy();
+				expect(user.password).not.toBe(password);
+				done();
+			});
+		});
+	});
+
+	it("should return validation error if request invalid", done => {
+		const email = "qs.fr";
+		const password = "4789";
+		request(app).post("/users").send({email, password})
+		.expect(400)
+		.end(done);
+	});
+
+	it("should note create user if email in use", done => {
+		const email = "xleto@hotmail.com";
+		const password = "Atreides_23";
+		request(app).post("/users").send({email, password})
+		.expect(400)
+		.end(done);
+	});
 });
