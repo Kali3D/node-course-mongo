@@ -22,7 +22,6 @@ app.post("/todos", (request, response) => {
 	todo.save()
 	.then(doc => response.send(doc))
 	.catch(error => response.status(400).send(error));
-	console.log(request.body);
 });
 
 app.get("/todos", (request, response) => {
