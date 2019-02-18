@@ -7,7 +7,7 @@ require("./config/config");
 
 const {mongoose} = require("./db/mongoose");
 const {Todo, User} = require("./models");
-
+const {authenticate} = require("./middlewares");
 
 
 const app = express();
@@ -69,6 +69,10 @@ app.patch("/todos/:id", (request, response) => {
 		response.status(404).send();
 	})
 	.catch(error => response.status(400).send());
+});
+
+app.get("/users/me", authenticate, (request, response) => {
+	response.send(request.user);
 });
 
 app.post("/users", (request, response) => {
