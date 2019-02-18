@@ -84,7 +84,14 @@ app.post("/users", (request, response) => {
 	.catch(error => response.status(400).send(error));
 });
 
-
+app.post("/users/login", (request, response) => {
+	const email = request.body.email;
+	const password = request.body.password;
+	User.findByCredentials(email, password).then(user => {
+		user.generateAuthToken().then(token => response.header("x-auth", token).send(user))
+	})
+	.catch(error => response.status(400).send());
+});
 
 
 
