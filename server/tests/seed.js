@@ -4,14 +4,15 @@ const jwt = require("jsonwebtoken");
 const {Todo, User} = require("../models");
 
 
+const userId = new ObjectID();
+const userId2 = new ObjectID();
 
 const dummies = [
-	{_id: new ObjectID(), text: "dummy 01"}, 
-	{_id: new ObjectID(), text: "dummy 02", completed: true, completedAt: 12345}, 
-	{_id: new ObjectID(), text: "dummy 03"}
+	{_id: new ObjectID(), text: "dummy 01", _creator: userId}, 
+	{_id: new ObjectID(), text: "dummy 02", completed: true, completedAt: 12345, _creator: userId2}, 
+	{_id: new ObjectID(), text: "dummy 03", _creator: userId}
 ];
 
-const userId = new ObjectID();
 
 const users = [{
 	_id: userId,
@@ -22,9 +23,13 @@ const users = [{
 		token: jwt.sign({_id: userId, access: "auth"}, "afhiufkn354").toString()
 	}]
 }, {
-	_id: new ObjectID(),
+	_id: userId2,
 	email: "ncharpin@axxescaraibes.net",
-	password: "123456789"
+	password: "123456789",
+	tokens: [{
+		access: "auth",
+		token: jwt.sign({_id: userId2, access: "auth"}, "afhiufkn354").toString()
+	}]
 }];
 
 
